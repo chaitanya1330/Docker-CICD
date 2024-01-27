@@ -1,0 +1,44 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y python3-pip python3-dev
+RUN pip3 install virtualenv
+RUN mkdir /new_chatapp
+COPY /new_chatapp /new_chatapp
+
+WORKDIR /new_chatapp/
+
+RUN virtualenv -p /usr/bin/python3 /venv
+RUN /bin/bash -c "source venv/bin/activate"
+
+RUN pip3 install -r requirements.txt
+
+RUN apt-get install python3-dev default-libmysqlclient-dev build-essential -y
+RUN pip3 install mysqlclient
+
+EXPOSE 8000
+
+WORKDIR /new_chatapp/fundoo/
+ENTRYPOINT ["python3", "manage.py", "migrate", "&&", "python3", "manage.py", "runserver", "0.0.0.0:8000"]
+
+
+-----------------------------------------------------------------------------------------
+FROM ubuntu:18.04
+RUN apt-get update && apt-get install python3-pip python3-dev -y
+
+RUN mkdir /new-chatapp
+COPY /new_chatapp  /new_chatapp
+WORKDIR /new_chatapp
+
+
+RUN pip3 install -r requirements.txt
+
+RUN apt-get install python3-dev default-libmysqlclient-dev build-essential -y
+RUN pip3 install mysqlclient
+EXPOSE 8000
+
+WORKDIR /new-chatapp/fundoo/
+ENTRYPOINT python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000
+
+
+
+docker run -it --name=app --network=docker_network_comp -p 8000:8000 imageID

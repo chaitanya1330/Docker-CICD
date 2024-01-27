@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+    
+
+    stages {
+        // stage('Create Docker Network') {
+        //     steps {
+        //         script {
+        //             // Create Docker network if it doesn't exist
+        //             sh "docker network ls -f name=docker_network_comp | grep docker_network_comp || docker network create docker_network_comp"
+        //         }
+        //     }
+        // }
+        
+        
+        stage('Pull Docker Images') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-hub-credentials', toolName: 'Docker') {
+                        // Pull your Docker images
+                        docker.image('chaitanyachay/db_image:v1.0').pull()
+                        docker.image('chaitanyachay/backend_image:v1.0').pull()
+                        docker.image('chaitanyachay/frontend_image:v1.0').pull()
+                    
+                
+            
+        
+        
+                    // Run containers on the specified network
+                    docker.image('chaitanyachay/db_image:v1.0').run(
+                        "--name=custom_con --network=docker_network_comp -p 3306:3306 -e MYSQL_PASSWORD=chay@1234 -d"
+                    )
+                    
+                    docker.image('chaitanyachay/backend_image:v1.0').run(
+                        "--name=app_cont --network=docker_network_comp -p 8000:8000 -d"
+                    )
+                    
+                    docker.image('chaitanyachay/frontend_image:v1.0').run(
+                        "--name=web_cont --network=docker_network_comp -p 80:80 -d"
+                    )
+                    
+                    }
+                }
+            }
+        }
+    }
+}

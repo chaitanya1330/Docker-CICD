@@ -1,0 +1,48 @@
+image : pypui
+FROM ubuntu:18.04 AS builder
+
+RUN apt-get update && apt-get install python3-pip python3-dev -y
+RUN pip3 install virtualenv
+
+RUN mkdir /new_chatapp
+COPY /new_chatapp /new_chatapp
+WORKDIR /new_chatapp/
+
+RUN virtualenv -p /usr/bin/python3 venv
+RUN /bin/bash -c "source venv/bin/activate"
+
+RUN /new_chatapp/venv/bin/pip3 install -r requirements.txt
+RUN apt-get install python3-dev default-libmysqlclient-dev build-essential -y
+RUN /new_chatapp/venv/bin/pip3 install mysqlclient
+CMD ["/bin/bash"]
+-----------------------------------------------------------------
+Image:msd
+FROM ubuntu:18.04 AS builder
+
+RUN apt-get update && apt-get install python3-pip python3-dev -y
+RUN pip3 install virtualenv
+
+RUN mkdir /new_chatapp
+COPY /new_chatapp /new_chatapp
+WORKDIR /new_chatapp/
+
+RUN virtualenv -p /usr/bin/python3 venv
+RUN /bin/bash -c "source venv/bin/activate"
+
+RUN /new_chatapp/venv/bin/pip3 install -r requirements.txt
+RUN apt-get install python3-dev default-libmysqlclient-dev build-essential -y
+RUN /new_chatapp/venv/bin/pip3 install mysqlclient
+
+
+FROM ubuntu:18.04 AS final
+RUN apt-get update && apt-get install python3-pip python3-dev -y
+RUN apt-get install python3-dev default-libmysqlclient-dev build-essential -y
+
+COPY --from=builder /new_chatapp /new_chatapp
+
+WORKDIR /new_chatapp/fundoo
+
+#ENTRYPOINT ["/bin/bash"]
+EXPOSE 8000
+ENTRYPOINT /new_chatapp/venv/bin/python3 manage.py migrate && /new_chatapp/venv/bin/python3 manage.py runserver 0.0.0.0:8000
+---------------------------------------------------------------------------------------------------------------------------------

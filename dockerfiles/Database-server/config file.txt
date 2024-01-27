@@ -1,0 +1,32 @@
+docker volume create mysql_vol
+path : /var/lib/docker/volumes
+docker run -it --name=srv01 --mount source=testvol1,destination=/data 4483fbdcc8d4
+
+
+docker run -d --name database_con -v /my/own/datadir:/var/lib/mysql -e MYSQL_PASSWORD=chay@1234 -d 4483fbdcc8d4
+COPY mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+
+docker run -d --name my-mysql-container -p 3306:3306 -v /my-custom.cnf:/etc/mysql/conf.d -v /var/lib/docker/volumes/mysql_vol:/var/lib/mysql-data my-mysql-image
+
+
+
+mysql -h localhost -u chay -p
+container-ID   image_ID         entry-point            created           status         ports                  
+9d82a760ec4a   d13feb504713   "/bin/sh -c 'python3…"   5 seconds ago    Up 3 seconds   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp  
+
+docker run -d --name=app_cont --network=docker_network_comp -p 8000:8000 d13feb504713
+
+docker run -d --name=web_cont --network=docker_network_comp -p 80:80 804ba8e22dc1
+
+docker run -d --name=custom-con --network=docker_network_comp -e MYSQL_ROOT_PASSWORD=chay@1234 -p 3306:3306 fd294bd94c3f
+
+
+docker run -d --name custom_con -e MYSQL_PASSWORD=chay@1234 -p 3306:3306 -v /var/lib/docker/volumes/mysql_vol:/var/lib/mysql-data 3d675bb3f9d1
+
+-------------------------------------------------------------------------
+in jenkins i should install some plugins: i.e
+
+:cloudbees docker build and publish plugin
+:docker pipeline
+:docker plugin
+:docker build step

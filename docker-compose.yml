@@ -1,0 +1,51 @@
+version: "2"
+
+services:
+  db:
+    build:
+      context: ./my_comp_sql
+      dockerfile: Dockerfile
+    image: db_image
+    container_name: custom_con
+    environment:
+      MYSQL_USER: chay
+      MYSQL_PASSWORD: chay@1234
+
+    ports:
+      - "3306:3306"
+    networks:
+      - network_comp
+    
+
+  backend:
+    build:
+      context: ./appserver
+      dockerfile: Dockerfile
+    image: backend_image
+    container_name: app_cont
+    ports:
+      - "8000:8000"
+    networks:
+      - network_comp
+    depends_on:
+      - db
+
+
+  frontend:
+    build:
+      context: ./webserver
+      dockerfile: Dockerfile
+    image: frontend_image
+    container_name: web_cont
+    ports:
+      - "80:80"
+    networks:
+      - network_comp 
+    depends_on:
+      - backend
+
+networks:
+  network_comp:
+    driver: bridge
+
+    

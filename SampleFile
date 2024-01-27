@@ -1,0 +1,69 @@
+FROM ubuntu:18.04
+LABEL maintainer="chaitanya@gmail.com"
+
+RUN apt-get update && apt-get -y install apache2
+EXPOSE 80
+
+ENTRYPOINT ["/usr/sbin/apachectl"]
+CMD ["-D", "FOREGROUND"]
+
+-----------------------------------------------
+
+FROM ubuntu:18.04
+
+LABEL maintainer="chaitanyachaitu@gmail.com"
+
+docker run -d --name docker-database -e MYSQL_ROOT_PASSWORD=chay1234 -p 3306:3306 docker_image:latest
+docker run -d --name chay-database -e MYSQL_PASSWORD=chay@1234 -p 3306:3306 4483fbdcc8d4
+docker exec -it mysql-container bash
+
+created a database inside that: host is localhost
+user is root
+port is 3306
+database name  = new_chatapp
+
+-------------
+# Use the official MySQL image from Docker Hub
+FROM mysql:latest
+
+# Set environment variables to configure MySQL
+ENV MYSQL_ROOT_PASSWORD=chay1234
+ENV MYSQL_DATABASE=chatapp_db
+ENV MYSQL_USER=chay
+ENV MYSQL_PASSWORD=chay@1234
+ENV MYSQL_HOST=localhost  
+-----------------
+
+docker exec -it mysql-database bash
+
+mysql -h localhost -u root -p
+
+
+
+
+
+
+
+---------------------------------------------------
+To create a Docker Volume use the command:
+
+docker volume create testvol1
+docker volume ls
+docker volume inspect testvol1
+---------------------------------------
+Mounting a Volume using -v or --mount
+---------------------------------------
+docker run -it --name=srv01 --mount source=testvol1,destination=/data centos
+docker run -it --name srv04 -v testvol1:/data centos
+docker run -it --volumes-from srv01 --name srv02 centos /bin/bash
+---------------------------------------
+Mounting a Host Directory as a Data volume 
+---------------------------------------
+mkdir files
+cd files
+touch file.txt
+docker run -it –-name srv05 -v "$(pwd)":/data1 centos
+---------------------------------------------
+To remove a volume:
+docker volume rm [volume_name]
+	

@@ -1,0 +1,44 @@
+FROM ubuntu:18.04
+WORKDIR /root
+
+RUN sudo apt update && sudo apt-get install python3-pip python3-dev -y
+RUN sudo apt-get update
+RUN sudo pip3 install virtualenv
+
+ADD new_chatapp
+WORKDIR /root/new_chatapp
+
+RUN virtualenv venv
+RUN source venv/bin/activate
+RUN pip3 install -r requirements.txt
+
+RUN sudo apt-get install python3-dev default-libmysqlclient-dev build-essential
+RUN pip3 install mysqlclient
+
+WORKDIR /new_chatapp/fundoo/
+ENTRYPOINT  ["python manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"]
+CMD ["-D", "FOREGROUND"]
+
+EXPOSE 8000
+------------------------------------------------------------------------------------------------------------
+FROM python:3.6
+
+ENV DATABASE_USER=chay
+ENV DATABASE_PASSWORD=chay@1234
+
+RUN apt-get update
+RUN apt-get install --yes python3-pip
+
+RUN mkdir /new_chatapp
+COPY /new_chatapp  /new_chatapp
+WORKDIR /new_chatapp
+RUN pip3 install -r requirements.txt
+RUN pip3 install mysqlclient
+EXPOSE 8000
+WORKDIR /new_chatapp/fundoo/
+ENTRYPOINT  python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000
+
+
+
+
+
